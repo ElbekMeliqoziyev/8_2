@@ -313,4 +313,33 @@ c.name = "Vali"
 
 # problem 15
 
-# class Person(BaseModel):
+class Person(BaseModel):
+    name : str
+    age : int
+
+data = '{"name":"Ali", "age":25}'
+p1 = Person.model_validate_json(data)
+
+
+class User(BaseModel):
+    name: str
+    age : int
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class DB_user:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    
+db = DB_user("Ali",25)
+
+user = User.model_validate(db)
+
+# problem 16
+
+class Color(str):
+   
