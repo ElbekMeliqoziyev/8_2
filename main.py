@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator, EmailStr
 
 # problem 1 
 
@@ -123,7 +123,7 @@ class Person(BaseModel):
             raise ValueError("Yil 1900 dan katta bo'lishi zarur")
         return year
 
-odam = Person(birth_year=1889)
+odam = Person(birth_year=1901)
 
 class Product(BaseModel):
     price : int
@@ -135,6 +135,86 @@ class Product(BaseModel):
             raise ValueError("price 1000 dan katta bo'lmasligi kerak")
         return narx
 
+product = Product(price=999)
 
+# problem 9
+
+from datetime import datetime
+
+class Event(BaseModel):
+    purpose : str
+    theme : str
+    start_date : datetime
+    end_date : datetime
+
+    @model_validator(mode='before')
+    @classmethod
+    def vaqtni_tekshirish(cls, data):
+        if data.get("end_date") <= data.get("start_date"):
+            raise ValueError("Vaqt noto'g'ri o'rnatilgan ")
+        return data
+
+event = Event(
+    purpose="Bilim va ko'nikma berish",
+    theme="Mustaqil o'rganish",
+    start_date="2026-02-20 14:00:00",
+    end_date="2026-02-20 17:00:00"
+)
+
+class Transaction(BaseModel):
+    amount : int
+    currency : str
+
+    @model_validator(mode='after')
+    def qiymatni_tekshirish(self):
+        if self.amount < 0:
+            raise ValueError("amount 0 dan kichik bo'lishi mumkin emas")
+        return self
+
+t = Transaction(amount=100, currency="USD")
+
+# problem 10
+
+class Address(BaseModel):
+    street : str
+    city : str
+    zipcode : str
+
+class User(BaseModel):
+    name : str
+    email : str
+    address : Address
+
+
+user = User(
+    name="Ali",
+    email="ali@gmail.com",
+    address=Address(
+        street="Navoiy ko'chasi",
+        city="Farg'ona",
+        zipcode="abc123"
+    )
+)
+
+
+class Item(BaseModel):
+    name : str
+    price : float
+
+class Order(BaseModel):
+    user : User
+    items : list[Item]
+
+item = Item(name="book", price=6.00)
+item2 = Item(name="phone", price=350.00)
+
+order = Order(user=user, items=[item,item2])
+
+# problem 11
+
+class User(BaseModel):
+    name : str
+    email : str = Field(pattern=r'^[a-zA-Z0-9._]+$')
+    password : 
 
 
