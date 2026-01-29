@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, field_validator, model_validator, EmailStr
+from pydantic import BaseModel, Field, field_validator, model_validator, EmailStr, computed_field
 
 # problem 1 
 
@@ -212,9 +212,105 @@ order = Order(user=user, items=[item,item2])
 
 # problem 11
 
-# class User(BaseModel):
-#     name : str
-#     email : str = Field(pattern=r'^[a-zA-Z0-9._]+$')
-#     password : 
+class User(BaseModel):
+    name : str
+    email : str = Field(pattern=r'^[a-zA-Z0-9._]+@gmail\.com$')
+    password : str
+
+user = User(name="Ali", email="ali@gmail.com",password="1234")
+echo = user.model_dump(include={"name", "email"})
 
 
+class Order(BaseModel):
+    id : int
+    user : str
+    items : str
+    discount : None = None
+
+order = Order(id=1, user="Ali", items="phone")
+# print(order.model_dump_json(exclude_none=True))
+
+# problem 12
+
+class User(BaseModel):
+    first_name : str = Field(alias="fName")
+    second_name : str
+
+user = User(fName="Ali", second_name="Vali")
+# print(user.model_dump(by_alias=True))
+
+class Product(BaseModel):
+    product_id : int = Field(alias="pid")
+    model_config = {
+        "populate_by_name":True
+    }
+    
+product = Product(pid=1)
+
+# problem 13
+
+class Rectangle(BaseModel):
+    width: int
+    height: int
+
+    @computed_field
+    @property
+    def area(self) -> int:
+        return self.width * self.height
+    
+r = Rectangle(width=10, height=10)
+
+
+class Invoice(BaseModel):
+    unit_price: float
+    quantity: int
+
+    @computed_field
+    @property
+    def total_price(self) -> float:
+        return self.unit_price * self.quantity
+    
+i = Invoice(unit_price=420, quantity=14)
+
+
+# problem 14
+
+class User(BaseModel):
+    first_name : str = Field(alias="fName")
+    second_name : str
+
+    # model_config = {
+    #     "extra":"forbid"
+    # }
+
+    @computed_field
+    @property
+    def fullname(self) -> str:
+        return f"{self.first_name}  {self.second_name}"
+
+user = User(fName="Ali", second_name="Vali", id=1)
+
+class Product(BaseModel):
+    name : str
+    price : float
+
+    # model_config = {
+    #     "strict": True
+    # }
+
+product = Product(name="olma", price="5000.00")
+
+class ConfigTest(BaseModel):
+    name : str
+
+    # model_config = {
+    #     "frozen":True
+    # }
+
+c = ConfigTest(name="Ali")
+c.name = "Vali"
+
+
+# problem 15
+
+# class Person(BaseModel):
