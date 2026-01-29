@@ -212,9 +212,9 @@ order = Order(user=user, items=[item,item2])
 
 # problem 11
 
-class User(BaseModel):
-    name : str
-    email : str = Field(pattern=r'^[a-zA-Z0-9._]+$')
-    password : 
+# class User(BaseModel):
+#     name : str
+#     email : str = Field(pattern=r'^[a-zA-Z0-9._]+$')
+#     password : 
 
 
